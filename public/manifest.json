@@ -1,8 +1,0 @@
-{
-  "name": "Marathi Voice Writer",
-  "short_name": "MarathiWriter",
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
-  "display": "standalone",
-  "orientation": "portrait"
-}

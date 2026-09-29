@@ -1,37 +1,45 @@
 # Marathi Voice Writer
 
-A Marathi voice-to-text drafting tool for lawyers.
+A complete application featuring a Next.js frontend (PWA) and a Python FastAPI backend.
 
-## Setup
+## Project Structure
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
+This is a monorepo setup containing both frontend and backend:
 
-2. Run the development server:
-   ```bash
-   npm run dev
-   ```
+```
+project-root/
+├── frontend/    ← Next.js PWA (User Interface)
+└── backend/     ← Python FastAPI (API Services)
+```
 
-3. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Frontend
 
-## Folder Structure
-- `src/app`: Contains Next.js App Router pages and layouts.
-- `src/components`: Reusable UI and layout components.
-- `src/constants`: Application constants (routes).
-- `src/lib`: Utility functions.
-- `src/types`: TypeScript types.
-- `public`: Static assets (PWA manifest).
+The frontend is built using Next.js (App Router), React, Tailwind CSS, and Lucide Icons. It is designed mobile-first as a PWA, targeting lawyers requiring Marathi voice dictation.
 
-## Route List
-- `/` - Welcome/Splash screen
-- `/new` - New document
-- `/recording` - Recording in progress
-- `/editor` - Edit document
-- `/documents` - My documents list
-- `/documents/[id]` - Document detail
-- `/templates` - Templates
-- `/settings` - Settings
+To run the frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-*Note: Icons for PWA will be added later.*
+### Backend
+
+The backend is built with Python and FastAPI (currently foundation only). It will later handle audio upload, transcription (Speech-to-Text), document storage, and user auth.
+
+To run the backend:
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate   # (or source venv/bin/activate on Mac/Linux)
+pip install -r requirements.txt
+cp .env.example .env
+uvicorn app.main:app --reload
+```
+
+## Upcoming Features (Roadmap)
+- MongoDB Integration for user and document storage
+- Marathi Speech-to-Text Integration
+- Next.js ↔ FastAPI integration
+- Authentication
+- PDF Export and Sharing

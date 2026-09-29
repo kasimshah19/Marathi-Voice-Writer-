@@ -1,10 +1,10 @@
-from fastapi import APIRouter
+from flask import Blueprint, jsonify
 
-router = APIRouter()
+bp = Blueprint("health", __name__)
 
-@router.get("/health", summary="Health Check")
-async def health_check():
-    return {
+@bp.route("/health", methods=["GET"])
+def health_check():
+    return jsonify({
         "status": "ok",
         "service": "marathi-voice-writer-api"
-    }
+    })

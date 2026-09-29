@@ -1,26 +1,31 @@
 import shutil
 import tempfile
 import os
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from flask import Blueprint, request, jsonify
 from app.services.stt import transcribe_audio
 
-router = APIRouter(prefix="/audio", tags=["audio"])
+bp = Blueprint("audio", __name__, url_prefix="/audio")
 
-@router.post("/transcribe")
-async def transcribe_audio_legacy(file: UploadFile = File(...)):
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="No file provided")
+@bp.route("/transcribe", methods=["POST"])
+def transcribe_audio_legacy():
+    if "file" not in request.files:
+        return jsonify({"detail": "No file provided"}), 400
+    
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"detail": "No file provided"}), 400
 
     try:
         # Create a temporary file to save the uploaded audio
-        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp:
-            shutil.copyfileobj(file.file, tmp)
+        ext = os.path.splitext(file.filename)[1]
+        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
+            file.save(tmp.name)
             tmp_path = tmp.name
 
         try:
             # Process the audio file to get text
             result = transcribe_audio(tmp_path)
-            return {"text": result.text}
+            return jsonify({"text": result.text})
 
         finally:
             # Ensure the temporary file is deleted even if processing fails
@@ -28,4 +33,4 @@ async def transcribe_audio_legacy(file: UploadFile = File(...)):
                 os.remove(tmp_path)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return jsonify({"detail": str(e)}), 500

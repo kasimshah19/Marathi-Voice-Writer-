@@ -1,9 +1,8 @@
-fastapi
-uvicorn[standard]
-motor
+Flask
+Flask-Cors
+pymongo
 pydantic
 pydantic-settings
 python-dotenv
 faster-whisper
 pydub
-python-multipart

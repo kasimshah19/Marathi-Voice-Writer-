@@ -1,10 +1,9 @@
 import logging
 import time
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from flask import Blueprint, request, jsonify
 
 from app.config import get_settings
-from app.schemas.transcription import TranscriptionResponse
 from app.services.stt import transcribe_audio
 from app.utils.audio import (
     cleanup_files,
@@ -15,63 +14,54 @@ from app.utils.audio import (
 )
 
 logger = logging.getLogger("api")
-router = APIRouter(tags=["Transcription"])
+bp = Blueprint("transcription", __name__)
 
-
-@router.post(
-    "/transcription",
-    response_model=TranscriptionResponse,
-    summary="Transcribe audio to Marathi text",
-    responses={
-        400: {"description": "Invalid or empty audio file"},
-        413: {"description": "Audio file too large"},
-        500: {"description": "Transcription failed"},
-    },
-)
-async def transcribe(file: UploadFile = File(...)):
+@bp.route("/transcription", methods=["POST"])
+def transcribe():
     """Accept a browser-recorded audio file and return Marathi text."""
     settings = get_settings()
     max_bytes = settings.max_audio_size_mb * 1024 * 1024
 
+    if "file" not in request.files:
+        return jsonify({"detail": "No file provided."}), 400
+    
+    file = request.files["file"]
+
     # --- Validate file exists / is not empty ---
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="No file provided.")
+    if file.filename == "":
+        return jsonify({"detail": "No file provided."}), 400
 
     # --- Validate content type ---
-    if not is_supported_content_type(file.content_type):
-        logger.warning(
-            "Rejected upload: unsupported content type %s", file.content_type
-        )
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unsupported audio type: {file.content_type}. "
-            "Please record in a supported format (webm, ogg, mp4, wav).",
-        )
+    if not is_supported_content_type(file.mimetype):
+        logger.warning("Rejected upload: unsupported content type %s", file.mimetype)
+        return jsonify({
+            "detail": f"Unsupported audio type: {file.mimetype}. "
+            "Please record in a supported format (webm, ogg, mp4, wav)."
+        }), 400
 
     # --- Read the body and validate size ---
-    body = await file.read()
+    body = file.read()
 
     if len(body) == 0:
-        raise HTTPException(status_code=400, detail="Uploaded audio file is empty.")
+        return jsonify({"detail": "Uploaded audio file is empty."}), 400
 
     if len(body) > max_bytes:
-        raise HTTPException(
-            status_code=413,
-            detail=f"Audio file exceeds the maximum allowed size of "
-            f"{settings.max_audio_size_mb} MB.",
-        )
+        return jsonify({
+            "detail": f"Audio file exceeds the maximum allowed size of "
+            f"{settings.max_audio_size_mb} MB."
+        }), 413
 
     logger.info(
         "Transcription request: filename=%s, content_type=%s, size=%d bytes",
         file.filename,
-        file.content_type,
+        file.mimetype,
         len(body),
     )
 
     # --- Save to temp file ---
-    extension = get_extension_for_content_type(file.content_type)
+    extension = get_extension_for_content_type(file.mimetype)
     tmp_path = save_upload_to_tempfile(body, extension)
-    converted_path: str | None = None
+    converted_path = None
 
     try:
         request_start = time.perf_counter()
@@ -82,10 +72,8 @@ async def transcribe(file: UploadFile = File(...)):
             converted_path = convert_to_wav(tmp_path)
             audio_path = converted_path
         except RuntimeError:
-            # FFmpeg not available — try the file as-is.
-            logger.info(
-                "FFmpeg unavailable; attempting transcription on raw upload."
-            )
+            # FFmpeg not available try the file as-is.
+            logger.info("FFmpeg unavailable; attempting transcription on raw upload.")
             audio_path = tmp_path
 
         # --- Transcribe ---
@@ -96,26 +84,20 @@ async def transcribe(file: UploadFile = File(...)):
 
         processing_time = round(time.perf_counter() - request_start, 2)
 
-        return TranscriptionResponse(
-            success=True,
-            text=result.text,
-            language=result.language,
-            duration_seconds=result.audio_duration,
-            processing_time_seconds=processing_time,
-        )
+        return jsonify({
+            "success": True,
+            "text": result.text,
+            "language": result.language,
+            "duration_seconds": result.audio_duration,
+            "processing_time_seconds": processing_time,
+        })
 
     except RuntimeError as exc:
         logger.error("Transcription runtime error: %s", exc)
-        raise HTTPException(
-            status_code=500,
-            detail="Transcription failed. Please try again.",
-        )
+        return jsonify({"detail": "Transcription failed. Please try again."}), 500
     except Exception as exc:
         logger.exception("Unexpected error during transcription")
-        raise HTTPException(
-            status_code=500,
-            detail="An unexpected error occurred during transcription.",
-        )
+        return jsonify({"detail": "An unexpected error occurred during transcription."}), 500
     finally:
         # Always clean up temporary files.
         cleanup_files(tmp_path, converted_path or "")

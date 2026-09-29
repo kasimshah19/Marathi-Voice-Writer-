@@ -15,7 +15,7 @@ export function DocumentDetailScreen() {
           {doc.title}
         </h1>
         <p className="text-[14px] text-slate-500 mt-1 font-[family-name:var(--font-inter)]">
-          <span className="font-[family-name:var(--font-noto-devanagari)]">{doc.date.split('·')[0].trim()}</span>
+          <span className="font-[family-name:var(--font-karma)]">{doc.date.split('·')[0].trim()}</span>
           {" · "}
           {doc.date.split('·')[1].trim()}
         </p>

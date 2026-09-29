@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Noto_Sans_Devanagari, Inter } from "next/font/google";
+import { Karma, Inter } from "next/font/google";
 import "./globals.css";
 import { MobileShell } from "@/components/layout/MobileShell";
 
-const notoSansDevanagari = Noto_Sans_Devanagari({
-  subsets: ["devanagari"],
+const karma = Karma({
+  subsets: ["devanagari", "latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-noto-devanagari",
+  display: "swap",
+  variable: "--font-karma",
 });
 
 const inter = Inter({
@@ -26,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="mr" translate="no" suppressHydrationWarning>
-      <body className={`${notoSansDevanagari.variable} ${inter.variable} font-sans antialiased`} suppressHydrationWarning>
+      <body className={`${karma.variable} ${inter.variable} font-sans antialiased`} suppressHydrationWarning>
         <MobileShell>
           {children}
         </MobileShell>

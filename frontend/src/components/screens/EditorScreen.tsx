@@ -48,7 +48,6 @@ export function EditorScreen() {
       document.execCommand("copy");
       document.body.removeChild(textarea);
     }
-    }
   }, [text]);
 
   const handleSave = async () => {

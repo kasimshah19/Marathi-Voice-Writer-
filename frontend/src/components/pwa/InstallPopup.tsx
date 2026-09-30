@@ -72,7 +72,7 @@ export function InstallPopup() {
           </div>
 
           <p className="font-karma text-[15px] text-slate-700 mt-1">
-            अॅप इंस्टॉल करा आणि फोनच्या होम स्क्रीनवरून एका टॅपमध्ये उघडा. जलद, सोपे आणि पूर्ण स्क्रीन.
+            ॲप इंस्टॉल करा आणि फोनच्या होम स्क्रीनवरून एका टॅपमध्ये उघडा. जलद, सोपे आणि पूर्ण स्क्रीन.
           </p>
 
           <div className="flex flex-col gap-3 my-2">

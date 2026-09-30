@@ -8,7 +8,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="absolute bottom-0 w-full bg-white border-t border-gray-100 px-6 py-3 flex justify-between items-center sm:rounded-b-[40px] shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+    <nav className="absolute bottom-0 w-full bg-white border-t border-gray-100 px-6 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] flex justify-between items-center sm:rounded-b-[40px] shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-40">
       {BOTTOM_NAV_ITEMS.map((item) => {
         const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href + '/'));
         const Icon = item.icon;

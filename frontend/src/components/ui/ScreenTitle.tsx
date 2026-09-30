@@ -7,7 +7,7 @@ interface ScreenTitleProps {
 
 export function ScreenTitle({ title, subtitle }: ScreenTitleProps) {
   return (
-    <div className="px-5 pt-6">
+    <div className="px-5 pt-[calc(24px+env(safe-area-inset-top))]">
       <div className="flex items-center gap-3">
         <MenuButton className="w-auto h-auto p-0 border-none shadow-none bg-transparent" />
         <h1 className="text-[26px] font-bold text-slate-900 leading-tight">{title}</h1>

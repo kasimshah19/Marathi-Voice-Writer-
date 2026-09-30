@@ -47,9 +47,9 @@ export default function RootLayout({
   return (
     <html lang="mr" translate="no" suppressHydrationWarning>
       <body className={`${karma.variable} ${inter.variable} font-sans antialiased`} suppressHydrationWarning>
-        <ServiceWorkerRegister />
         <InstallProvider>
           <MobileShell>
+            <ServiceWorkerRegister />
             {children}
             <InstallPopup />
           </MobileShell>

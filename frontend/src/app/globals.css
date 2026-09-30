@@ -23,4 +23,35 @@ body {
   background-attachment: fixed;
   color: var(--color-text-primary);
   line-height: 1.8;
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+button, a {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input, textarea {
+  /* Prevent iOS zoom on focus */
+  font-size: max(16px, 1em);
+  scroll-margin-bottom: 120px;
+}
+
+img, video, iframe, canvas, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fallback for 100dvh if not supported */
+@supports not (height: 100dvh) {
+  .min-h-\[100dvh\] {
+    min-height: 100vh;
+  }
+  .h-\[100dvh\] {
+    height: 100vh;
+  }
 }

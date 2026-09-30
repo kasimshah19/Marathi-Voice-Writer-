@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Karma, Inter } from "next/font/google";
 import "./globals.css";
 import { MobileShell } from "@/components/layout/MobileShell";
@@ -15,9 +15,25 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#4f6bff",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "Marathi Voice Writer",
-  description: "आवाजातून मराठीत लेखन",
+  description: "आवाजातून मराठीत लेखन - वकिलांसाठी खास, सोपे आणि वेगवान साधन",
+  applicationName: "Marathi Voice Writer",
+  appleWebApp: { 
+    capable: true, 
+    title: "Voice Writer", 
+    statusBarStyle: "default" 
+  },
+  formatDetection: { 
+    telephone: false 
+  },
 };
 
 export default function RootLayout({

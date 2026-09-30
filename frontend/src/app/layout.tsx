@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Karma, Inter } from "next/font/google";
 import "./globals.css";
 import { MobileShell } from "@/components/layout/MobileShell";
+import { InstallProvider } from "@/components/pwa/InstallProvider";
+import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
+import { InstallPopup } from "@/components/pwa/InstallPopup";
 
 const karma = Karma({
   subsets: ["devanagari", "latin"],
@@ -44,9 +47,13 @@ export default function RootLayout({
   return (
     <html lang="mr" translate="no" suppressHydrationWarning>
       <body className={`${karma.variable} ${inter.variable} font-sans antialiased`} suppressHydrationWarning>
-        <MobileShell>
-          {children}
-        </MobileShell>
+        <ServiceWorkerRegister />
+        <InstallProvider>
+          <MobileShell>
+            {children}
+            <InstallPopup />
+          </MobileShell>
+        </InstallProvider>
       </body>
     </html>
   );

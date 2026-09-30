@@ -1,3 +1,5 @@
+"use client";
+
 import { ScreenTitle } from '@/components/ui/ScreenTitle';
 import { ProfileCard } from '@/components/ui/ProfileCard';
 import { SettingsGroup } from '@/components/ui/SettingsGroup';
@@ -5,8 +7,22 @@ import { SettingsRow } from '@/components/ui/SettingsRow';
 import { ToggleSwitch } from '@/components/ui/ToggleSwitch';
 import { LogoutButton } from '@/components/ui/LogoutButton';
 import { Globe, Palette, Type, WifiOff, Volume2, Keyboard, Download, Share2 } from 'lucide-react';
+import { useInstallPrompt } from '@/components/pwa/InstallProvider';
+import { useState } from 'react';
 
 export function SettingsScreen() {
+  const { canInstall, isInstalled, isIOS, openPrompt } = useInstallPrompt();
+  const [showUnsupportedHint, setShowUnsupportedHint] = useState(false);
+
+  const handleInstallClick = () => {
+    if (isInstalled) return;
+    if (canInstall || isIOS) {
+      openPrompt();
+    } else {
+      setShowUnsupportedHint(true);
+      setTimeout(() => setShowUnsupportedHint(false), 3000);
+    }
+  };
   return (
     <div className="flex flex-col min-h-full pb-4" style={{ background: "linear-gradient(180deg,#ffffff 0%,#f7f5ff 60%,#efeaff 100%)" }}>
       <ScreenTitle title="सेटिंग्ज" />
@@ -54,8 +70,15 @@ export function SettingsScreen() {
         <SettingsRow 
           icon={<Download size={20} />} 
           label="PWA इंस्टॉल करा" 
-          chevron="right" 
+          chevron={isInstalled ? 'none' : 'right'} 
+          rightContent={isInstalled ? <span className="text-green-600 font-sans text-xs font-semibold px-2">इंस्टॉल केले</span> : undefined}
+          onClick={handleInstallClick}
         />
+        {showUnsupportedHint && (
+          <div className="px-4 py-2 bg-slate-50 text-slate-500 text-[13px] font-karma text-center">
+            हा ब्राउझर इंस्टॉलला सपोर्ट करत नाही. Chrome किंवा Safari वापरा.
+          </div>
+        )}
         <SettingsRow 
           icon={<Share2 size={20} />} 
           label="ॲप शेअर करा" 

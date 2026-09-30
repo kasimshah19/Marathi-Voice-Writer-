@@ -8,11 +8,15 @@ interface SettingsRowProps {
   rightText?: string;
   chevron?: 'right' | 'down' | 'none';
   hasDivider?: boolean;
+  onClick?: () => void;
 }
 
-export function SettingsRow({ icon, label, rightContent, rightText, chevron = 'none', hasDivider = true }: SettingsRowProps) {
+export function SettingsRow({ icon, label, rightContent, rightText, chevron = 'none', hasDivider = true, onClick }: SettingsRowProps) {
   return (
-    <li className={`flex items-center justify-between min-h-[50px] py-2 ${hasDivider ? 'border-b border-slate-100' : ''}`}>
+    <li 
+      className={`flex items-center justify-between min-h-[50px] py-2 ${hasDivider ? 'border-b border-slate-100' : ''} ${onClick ? 'cursor-pointer' : ''}`}
+      onClick={onClick}
+    >
       <div className="flex items-center gap-3.5">
         <span className="text-slate-600 flex items-center justify-center w-5 h-5 shrink-0">
           {icon}

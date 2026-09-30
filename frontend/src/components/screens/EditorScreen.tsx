@@ -5,13 +5,17 @@ import { Copy, Share2, FileText, Save } from "lucide-react";
 import { EditorHeader } from "@/components/ui/EditorHeader";
 import { EditorTextArea } from "@/components/ui/EditorTextArea";
 import { UndoRedoBar } from "@/components/ui/UndoRedoBar";
+import { useRouter } from "next/navigation";
 import { ActionTile } from "@/components/ui/ActionTile";
 import { ROUTES } from "@/constants/routes";
-import type { TranscriptionResponse } from "@/lib/api";
+import { type TranscriptionResponse, createDocument, updateDocument } from "@/lib/api";
 
 export function EditorScreen() {
+  const router = useRouter();
   const [text, setText] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [documentId, setDocumentId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Load transcript from sessionStorage (set by RecordingScreen on success)
   useEffect(() => {
@@ -44,7 +48,27 @@ export function EditorScreen() {
       document.execCommand("copy");
       document.body.removeChild(textarea);
     }
+    }
   }, [text]);
+
+  const handleSave = async () => {
+    if (!text.trim() || isSaving) return;
+    setIsSaving(true);
+    try {
+      if (documentId) {
+        await updateDocument(documentId, "Marathi Voice Document", text);
+      } else {
+        const doc = await createDocument("Marathi Voice Document", text);
+        setDocumentId(doc.id);
+      }
+      router.push(ROUTES.DOCUMENTS);
+    } catch (error) {
+      console.error("Failed to save document:", error);
+      alert("Failed to save document. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Don't render until sessionStorage has been checked (avoids flash)
   if (!loaded) return null;
@@ -73,8 +97,9 @@ export function EditorScreen() {
         />
         <ActionTile
           icon={<Save size={22} className="text-blue-600" />}
-          label="जतन करा"
-          href={ROUTES.DOCUMENTS}
+          label={isSaving ? "जतन करत आहे..." : "जतन करा"}
+          onClick={handleSave}
+          disabled={isSaving}
         />
       </div>
     </div>

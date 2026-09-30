@@ -22,6 +22,16 @@ export interface ApiError {
   detail: string;
 }
 
+export interface Document {
+  id: string;
+  title: string;
+  content: string;
+  language: string;
+  word_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
 // ─── Health check ───────────────────────────────────────────────────────────
 
 export async function checkHealth(): Promise<boolean> {
@@ -71,4 +81,49 @@ export async function transcribeAudio(
 
   const data: TranscriptionResponse = await response.json();
   return data;
+}
+
+// ─── Documents ──────────────────────────────────────────────────────────────
+
+export async function getDocuments(): Promise<Document[]> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/documents`);
+  if (!response.ok) throw new Error("Failed to fetch documents");
+  const data = await response.json();
+  return data.documents;
+}
+
+export async function getDocument(id: string): Promise<Document> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/documents/${id}`);
+  if (!response.ok) throw new Error("Failed to fetch document");
+  const data = await response.json();
+  return data.document;
+}
+
+export async function createDocument(title: string, content: string): Promise<Document> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/documents`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, content }),
+  });
+  if (!response.ok) throw new Error("Failed to create document");
+  const data = await response.json();
+  return data.document;
+}
+
+export async function updateDocument(id: string, title: string, content: string): Promise<Document> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/documents/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, content }),
+  });
+  if (!response.ok) throw new Error("Failed to update document");
+  const data = await response.json();
+  return data.document;
+}
+
+export async function deleteDocument(id: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/v1/documents/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) throw new Error("Failed to delete document");
 }

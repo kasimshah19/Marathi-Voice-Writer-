@@ -1,6 +1,6 @@
 # Marathi Voice Writer - Backend
 
-FastAPI backend for the Marathi Voice Writer PWA.
+Flask backend for the Marathi Voice Writer PWA.
 
 ## Requirements
 
@@ -36,9 +36,9 @@ Copy `.env.example` to `.env` and adjust the variables to match your MongoDB set
 cp .env.example .env
 ```
 
-5. Start the FastAPI development server:
+5. Start the Flask development server:
 ```bash
-uvicorn app.main:app --reload --port 8000
+venv\Scripts\python.exe run.py
 ```
 
 6. Test the API:
@@ -52,4 +52,3 @@ You should receive:
 }
 ```
 
-Interactive API documentation (Swagger UI) is available at: http://localhost:8000/docs

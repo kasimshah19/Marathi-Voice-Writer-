@@ -20,9 +20,11 @@ def create_app():
     from app.routes.health import bp as health_bp
     from app.routes.transcription import bp as transcription_bp
     from app.routes.audio import bp as audio_bp
+    from app.routes.documents import bp as documents_bp
 
     app.register_blueprint(health_bp, url_prefix="/api/v1")
     app.register_blueprint(transcription_bp, url_prefix="/api/v1")
     app.register_blueprint(audio_bp, url_prefix="/api/v1")
+    app.register_blueprint(documents_bp, url_prefix="/api/v1")
 
     return app

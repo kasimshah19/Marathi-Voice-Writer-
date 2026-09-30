@@ -85,8 +85,11 @@ export async function transcribeAudio(
 
 // ─── Documents ──────────────────────────────────────────────────────────────
 
-export async function getDocuments(): Promise<Document[]> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/documents`);
+export async function getDocuments(searchQuery?: string): Promise<Document[]> {
+  const url = searchQuery 
+    ? `${API_BASE_URL}/api/v1/documents?search=${encodeURIComponent(searchQuery)}` 
+    : `${API_BASE_URL}/api/v1/documents`;
+  const response = await fetch(url);
   if (!response.ok) throw new Error("Failed to fetch documents");
   const data = await response.json();
   return data.documents;

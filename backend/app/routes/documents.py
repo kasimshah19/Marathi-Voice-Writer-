@@ -50,7 +50,13 @@ def create_document():
 @bp.route("/documents", methods=["GET"])
 def get_documents():
     db = get_database()
-    cursor = db.documents.find().sort("updated_at", -1)
+    search_query = request.args.get("search", "").strip()
+    
+    if search_query:
+        cursor = db.documents.find({"$text": {"$search": search_query}}).sort("updated_at", -1)
+    else:
+        cursor = db.documents.find().sort("updated_at", -1)
+        
     docs = [serialize_doc(doc) for doc in cursor]
     return jsonify({
         "success": True,

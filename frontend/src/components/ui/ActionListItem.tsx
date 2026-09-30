@@ -7,9 +7,10 @@ interface ActionListItemProps {
   isDanger?: boolean;
   isLast?: boolean;
   href?: string;
+  onClick?: () => void;
 }
 
-export function ActionListItem({ icon: Icon, label, isDanger, isLast, href }: ActionListItemProps) {
+export function ActionListItem({ icon: Icon, label, isDanger, isLast, href, onClick }: ActionListItemProps) {
   const content = (
     <>
       <Icon size={18} aria-hidden />{label}
@@ -21,11 +22,11 @@ export function ActionListItem({ icon: Icon, label, isDanger, isLast, href }: Ac
   return (
     <li className={`${!isLast ? "border-b border-slate-100" : ""}`}>
       {href ? (
-        <Link href={href} className={className}>
+        <Link href={href} className={className} onClick={onClick}>
           {content}
         </Link>
       ) : (
-        <button type="button" className={className}>
+        <button type="button" className={className} onClick={onClick}>
           {content}
         </button>
       )}

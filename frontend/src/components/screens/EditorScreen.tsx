@@ -12,23 +12,42 @@ import { type TranscriptionResponse, createDocument, updateDocument } from "@/li
 
 export function EditorScreen() {
   const router = useRouter();
+  const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [documentId, setDocumentId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Load transcript from sessionStorage (set by RecordingScreen on success)
+  // Load transcript from sessionStorage or from API
   useEffect(() => {
-    try {
-      const stored = sessionStorage.getItem("mvw_transcript");
-      if (stored) {
-        const data: TranscriptionResponse = JSON.parse(stored);
-        setText(data.text);
+    const searchParams = new URLSearchParams(window.location.search);
+    const docId = searchParams.get('docId');
+
+    async function loadDoc() {
+      if (docId) {
+        try {
+          const { getDocument } = await import('@/lib/api');
+          const doc = await getDocument(docId);
+          setText(doc.content);
+          setTitle(doc.title);
+          setDocumentId(docId);
+        } catch (e) {
+          console.error("Failed to load document:", e);
+        }
+      } else {
+        try {
+          const stored = sessionStorage.getItem("mvw_transcript");
+          if (stored) {
+            const data: TranscriptionResponse = JSON.parse(stored);
+            setText(data.text);
+          }
+        } catch {
+          // Ignore parse errors
+        }
       }
-    } catch {
-      // Ignore parse errors — editor starts empty if nothing stored
+      setLoaded(true);
     }
-    setLoaded(true);
+    loadDoc();
   }, []);
 
   const wordCount = text.trim()
@@ -53,13 +72,20 @@ export function EditorScreen() {
   const handleSave = async () => {
     if (!text.trim() || isSaving) return;
     setIsSaving(true);
+    
+    const finalTitle = title.trim() ? title.trim() : "शीर्षकहीन दस्तऐवज";
+
     try {
       if (documentId) {
-        await updateDocument(documentId, "Marathi Voice Document", text);
+        await updateDocument(documentId, finalTitle, text);
       } else {
-        const doc = await createDocument("Marathi Voice Document", text);
+        const doc = await createDocument(finalTitle, text);
         setDocumentId(doc.id);
       }
+      // Clean up session storage on success
+      sessionStorage.removeItem("mvw_transcript");
+      
+      alert("यशस्वीरीत्या जतन केले!");
       router.push(ROUTES.DOCUMENTS);
     } catch (error) {
       console.error("Failed to save document:", error);
@@ -74,7 +100,7 @@ export function EditorScreen() {
 
   return (
     <div className="flex flex-col min-h-full bg-gradient-to-b from-white via-[#f7f5ff] to-[#efeaff]">
-      <EditorHeader />
+      <EditorHeader title={title} onChangeTitle={setTitle} isSaving={isSaving} backHref={documentId ? ROUTES.DOCUMENTS : ROUTES.NEW_DOCUMENT} />
 
       <EditorTextArea value={text} onChange={setText} />
 

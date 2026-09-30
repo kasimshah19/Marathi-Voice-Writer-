@@ -1,10 +1,6 @@
 import { Pencil, Copy, FileDown, Share2, Trash2 } from 'lucide-react';
 import { ActionListItem } from './ActionListItem';
 import { ROUTES } from '@/constants/routes';
-
-import { Pencil, Copy, FileDown, Share2, Trash2 } from 'lucide-react';
-import { ActionListItem } from './ActionListItem';
-import { ROUTES } from '@/constants/routes';
 import { deleteDocument } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
